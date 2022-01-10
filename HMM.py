@@ -15,6 +15,11 @@ def read(file):
             data[idx].append((tmp[0], tmp[1]))
     return data
 
+def preprocess(train_set):
+    train_tagged_words = [tup for sent in train_set for tup in sent]
+    tags = {tag for _, tag in train_tagged_words}
+    return train_tagged_words, tags
+
 def create_vocab(train, test):
     train_tagged_words = [tup for sent in train for tup in sent]
     test_tagged_words = [tup[0] for sent in test for tup in sent]
@@ -24,7 +29,7 @@ def create_vocab(train, test):
 
 def word_given_tag(word,tag,train_bag):
     taglist = [pair for pair in train_bag if pair[1] == tag]
-    tag_count = len(taglist)    
+    tag_count = len(taglist) + 16
     w_in_tag = [pair[0] for pair in taglist if pair[0]==word]    
     word_count_given_tag = len(w_in_tag)    
     
@@ -33,7 +38,7 @@ def word_given_tag(word,tag,train_bag):
 def t2_given_t1(t2,t1,train_bag):
     tags = [pair[1] for pair in train_bag]
     t1_tags = [tag for tag in tags if tag==t1]
-    count_of_t1 = len(t1_tags) + 1
+    count_of_t1 = len(t1_tags) + 16
     t2_given_t1 = [tags[index+1] for index in range(len(tags)-1) if tags[index] == t1 and tags[index+1] == t2]  
     count_t2_given_t1 = len(t2_given_t1) + 1
     return(count_t2_given_t1,count_of_t1)
@@ -82,6 +87,13 @@ def test(test_set, test_tagged_words, train_tagged_words, tags_df):
     return vanilla_viterbi_accuracy
 
 # print("The accuracy of the Vanilla Viterbi Algorithm is -", vanilla_viterbi_accuracy)
+
+def load_train_file(train_set):
+    data = read(train_set)
+    train_tagged_words, tags = preprocess(data)
+    tags_df = transition_matrix(tags, train_tagged_words)
+    return tags_df
+
 
 def compute(train_set, test_set):
     train_tagged_words, test_tagged_words, tags = create_vocab(train_set, test_set)
