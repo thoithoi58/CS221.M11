@@ -92,7 +92,7 @@ def load_train_file(train_set):
     data = read(train_set)
     train_tagged_words, tags = preprocess(data)
     tags_df = transition_matrix(tags, train_tagged_words)
-    return tags_df
+    return train_tagged_words, tags_df
 
 
 def compute(train_set, test_set):
