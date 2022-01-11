@@ -1,8 +1,8 @@
 from tkinter import * 
 from tkinter.ttk import *
-import HMM as hm
-import CRF as cr
+import HMM as hmm_
 import spacy
+from joblib import load
 
 class HMM:
     def __init__(self, master):
@@ -33,7 +33,7 @@ class HMM:
 
         
     def load_model(self):
-        train_tagged_words, tags_df = hm.load_train_file('corpus/train.txt')
+        train_tagged_words, tags_df = hmm_.load_train_file('corpus/train.txt')
         return train_tagged_words, tags_df
 
     def tag(self):
@@ -43,7 +43,7 @@ class HMM:
         for sent in inputValue:
             tmp = nlp(sent)
             tmp = [token.text for token in tmp]
-            seq = hm.Viterbi(tmp, self.tags_df, self.train_tagged_words)
+            seq = hmm_.Viterbi(tmp, self.tags_df, self.train_tagged_words)
             self.output.insert(END, seq)
             self.output.insert(END, '\n')
 
@@ -77,7 +77,7 @@ class CRF:
 
         
     def load_model(self):
-        model = cr.load_model('crf.joblib')
+        model = load('crf.joblib')
         return model
 
     def feature_extract(self, sent, idx):
